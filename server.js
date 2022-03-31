@@ -1,14 +1,27 @@
+// server.js
 const express = require("express");
+const app = express();
+const connectDb = require("./src/connection");
+const User = require("./src/User.model");
 
 const PORT = 8080;
-const HOST = '0.0.0.0';
 
-const app = express();
-
-app.get("/", (req, res) => {
-    res.send("Hello from Node.js app\n");
+app.get("/users", async (req, res) => {
+    const users = await User.find();
+    
+    res.json(users);
 });
 
-app.listen(PORT, HOST, () => {
-    console.log(`Running on http://${HOST}:${PORT}`);
+app.get("/user-create", async (req, res) => {
+    const user = new User({ username: "userTest" });
+
+    await user.save().then(() => console.log("User created"));
+    res.send("User created \n");
+});
+
+app.listen(PORT, function() {
+    console.log(`Listening on ${PORT}`);
+    connectDb().then(() => {
+        console.log("Mongodb connected");
+    });
 });
